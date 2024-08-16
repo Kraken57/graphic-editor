@@ -18,18 +18,10 @@ myCanvas.width = canvasProps.width;
 myCanvas.height = canvasProps.height;
 
 const ctx = myCanvas.getContext("2d");
-ctx.fillStyle = "gray";
-ctx.fillRect(0, 0, myCanvas.width, myCanvas.height);
+clearCanvas();
 
-ctx.fillStyle = "white";
-ctx.fillRect(
-  stageProps.left,
-  stageProps.top,
-  stageProps.width,
-  stageProps.height
-);
-
-const route = [];
+const shapes = [];
+let route = [];
 
 myCanvas.addEventListener("pointerdown", function (e) {
   const mousePos = {
@@ -37,21 +29,51 @@ myCanvas.addEventListener("pointerdown", function (e) {
     y: e.offsetY,
   };
   route.push(mousePos);
-});
 
-myCanvas.addEventListener("pointermove", function (e) {
-  const mousePos = {
-    x: e.offsetX,
-    y: e.offsetY,
+  const downCallBack = function (e) {
+    const mousePos = {
+      x: e.offsetX,
+      y: e.offsetY,
+    };
+    route.push(mousePos);
+
+    clearCanvas();
+
+    for (const shape of [...shapes, route]) {
+      ctx.beginPath();
+      ctx.strokeStyle = "rgba(0, 0, 0, 0.5)";
+      ctx.lineWidth = 5;
+      ctx.moveTo(shape[0].x, shape[0].y);
+      for (let i = 1; i < shape.length; i++) {
+        ctx.lineTo(shape[i].x, shape[i].y);
+      }
+
+      ctx.stroke();
+    }
   };
-  route.push(mousePos);
+
+  const upCallBack = function (e) {
+    myCanvas.removeEventListener("pointermove", downCallBack);
+    myCanvas.removeEventListener("pointerup", upCallBack);
+
+    shapes.push(route);
+    route = [];
+  };
+
+  myCanvas.addEventListener("pointermove", downCallBack);
+  myCanvas.addEventListener("pointerup", upCallBack);
 });
 
-myCanvas.addEventListener("pointerup", function (e) {
-  ctx.beginPath();
-  ctx.moveTo(route[0].x, route[0].y);
-  route.forEach((point) => {
-    ctx.lineTo(point.x, point.y);
-  });
-  ctx.stroke();
-});
+function clearCanvas() {
+  ctx.clearRect(0, 0, myCanvas.width, myCanvas.height);
+  ctx.fillStyle = "gray";
+  ctx.fillRect(0, 0, myCanvas.width, myCanvas.height);
+
+  ctx.fillStyle = "white";
+  ctx.fillRect(
+    stageProps.left,
+    stageProps.top,
+    stageProps.width,
+    stageProps.height
+  );
+}
