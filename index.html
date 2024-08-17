@@ -6,7 +6,7 @@
   </head>
   <body>
     <canvas id="myCanvas"></canvas>
-    <select id="toolBox">
+    <select id="toolBox" onchange="changeTool(this.value)">
         <option value="freeform" selected>Freeform</option>
         <option value="rect">Rect</option>  
     </select>
