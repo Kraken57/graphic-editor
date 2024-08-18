@@ -22,6 +22,7 @@ clearCanvas();
 
 const shapes = [];
 let currentRoute = [];
+let currentShape = null;
 let currentRectangle = { type: "rect" };
 
 // To draw a rectangle
@@ -30,25 +31,24 @@ const downCallBackForRect = function (e) {
     x: e.offsetX,
     y: e.offsetY,
   };
-  currentRectangle.corner1 = mousePos;
+  currentShape = new Rect(mousePos);
 
   const moveCallBack = function (e) {
     const mousePos = {
       x: e.offsetX,
       y: e.offsetY,
     };
-    currentRectangle.corner2 = mousePos;
+    currentShape.setCorner2(mousePos);
 
     clearCanvas();
-    drawShapes([...shapes, currentRectangle]);
+    drawShapes([...shapes, currentShape]);
   };
 
   const upCallBack = function () {
     myCanvas.removeEventListener("pointermove", moveCallBack);
     myCanvas.removeEventListener("pointerup", upCallBack);
 
-    shapes.push(currentRectangle);
-    currentRectangle = { type: "rect" };
+    shapes.push(currentShape);
   };
 
   myCanvas.addEventListener("pointermove", moveCallBack);
@@ -61,25 +61,24 @@ const downCallBackForFreeform = function (e) {
     x: e.offsetX,
     y: e.offsetY,
   };
-  currentRoute.push(mousePos);
+  currentShape = new Freeform([mousePos]);
 
   const moveCallBack = function (e) {
     const mousePos = {
       x: e.offsetX,
       y: e.offsetY,
     };
-    currentRoute.push(mousePos);
+    currentShape.addPoint(mousePos);
 
     clearCanvas();
-    drawShapes([...shapes, { type: "freeform", points: currentRoute }]);
+    drawShapes([...shapes, currentShape]);
   };
 
   const upCallBack = function () {
     myCanvas.removeEventListener("pointermove", moveCallBack);
     myCanvas.removeEventListener("pointerup", upCallBack);
 
-    shapes.push({ type: "freeform", points: currentRoute });
-    currentRoute = [];
+    shapes.push(currentShape);
   };
 
   myCanvas.addEventListener("pointermove", moveCallBack);
@@ -103,29 +102,7 @@ function changeTool(tool) {
 
 function drawShapes(shapes) {
   for (const shape of shapes) {
-    switch (shape.type) {
-      case "rect":
-        ctx.beginPath();
-        ctx.strokeStyle = "rgba(0, 0, 0, 0.5)";
-        ctx.lineWidth = 5;
-        const minX = Math.min(shape.corner1.x, shape.corner2.x);
-        const minY = Math.min(shape.corner1.y, shape.corner2.y);
-        const width = Math.abs(shape.corner1.x - shape.corner2.x);
-        const height = Math.abs(shape.corner1.y - shape.corner2.y);
-        ctx.rect(minX, minY, width, height);
-        ctx.stroke();
-        break;
-      case "freeform":
-        ctx.beginPath();
-        ctx.strokeStyle = "rgba(0, 0, 0, 0.5)";
-        ctx.lineWidth = 5;
-        ctx.moveTo(shape.points[0].x, shape.points[0].y);
-        for (let i = 1; i < shape.points.length; i++) {
-          ctx.lineTo(shape.points[i].x, shape.points[i].y);
-        }
-        ctx.stroke();
-        break;
-    }
+    shape.draw(ctx);
   }
 }
 

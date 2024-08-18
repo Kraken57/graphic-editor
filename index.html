@@ -6,16 +6,17 @@
     <link
       rel="icon"
       type="image/x-icon"
-      href="https://cdn.logojoy.com/wp-content/uploads/2018/05/30143717/146.png
-      "
+      href="https://cdn.logojoy.com/wp-content/uploads/2018/05/30143717/146.png"
     />
   </head>
   <body>
     <canvas id="myCanvas"></canvas>
     <select id="toolBox" onchange="changeTool(this.value)">
       <option value="freeform" selected>Freeform</option>
-      <option value="rect">Rect</option>
+      <option value="rect">Rectangle</option>
     </select>
+    <script src="shapes/rect.js"></script>
+    <script src="shapes/freeform.js"></script>
     <script src="script.js"></script>
   </body>
 </html>
